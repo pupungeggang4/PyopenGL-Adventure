@@ -24,7 +24,7 @@ class Game():
 
     def run():
         while True:
-            pass
+            self.clock.tick(self.fps)
 
 if __name__ == '__main__':
     Game().run()
