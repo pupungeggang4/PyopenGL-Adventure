@@ -2,8 +2,15 @@ import sys, pygame, glfw, numpy as np
 from glfw.GLFW import *
 from OpenGL.GL import *
 
+import script.scenetitle as scenetitle
+import script.scenegame as scenegame
+
 class Game():
     def __init__(self):
+        self.scene = 'title'
+        self.state = ''
+        self.menu = False
+
         self.gl_init()
         pygame.init()
         self.surface_ui = pygame.surface.Surface((1280, 720), pygame.SRCALPHA)
@@ -87,10 +94,12 @@ class Game():
     def run(self):
         while not glfwWindowShouldClose(self.window):
             self.clock.tick(self.fps)
-            glClearColor(0.0, 0.0, 0.0, 1.0)
-            glClear(GL_COLOR_BUFFER_BIT)
-            glfw.swap_buffers(self.window)
+            self.handle_scene()
             glfw.poll_events()
+
+    def handle_scene(self):
+        if self.scene == 'title':
+            scenetitle.loop(self)
 
 if __name__ == '__main__':
     Game().run()
