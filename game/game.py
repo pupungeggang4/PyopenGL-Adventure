@@ -1,6 +1,4 @@
-import sys, pygame, glfw, numpy as np
-from glfw.GLFW import *
-from OpenGL.GL import *
+from script.module import *
 
 import script.scenetitle as scenetitle
 import script.scenegame as scenegame
@@ -13,7 +11,9 @@ class Game():
 
         self.gl_init()
         pygame.init()
-        self.surface_ui = pygame.surface.Surface((1280, 720), pygame.SRCALPHA)
+        self.load_font()
+        
+        self.surface_hud = pygame.surface.Surface((1280, 720), pygame.SRCALPHA)
         self.clock = pygame.time.Clock()
         self.fps = 60
 
@@ -23,9 +23,14 @@ class Game():
         glfw.window_hint(glfw.CONTEXT_VERSION_MINOR, 1)
         glfw.window_hint(glfw.OPENGL_PROFILE, glfw.OPENGL_CORE_PROFILE)
         glfw.window_hint(glfw.OPENGL_FORWARD_COMPAT, True)
+        glfw.window_hint(GLFW_SCALE_TO_MONITOR, True)
+        glfw.window_hint(GLFW_POSITION_X, 100)
+        glfw.window_hint(GLFW_POSITION_Y, 100)
         self.window = glfwCreateWindow(1280, 720, 'OpenGL Adventure', None, None)
+        self.monitor = glfwGetPrimaryMonitor()
         self.context = glfw.make_context_current(self.window)
         glfwSetKeyCallback(self.window, self.key_callback)
+        glfwSetMouseButtonCallback(self.window, self.mouse_button_callback)
         glfwSetWindowCloseCallback(self.window, self.window_close_callback)
 
         f = open('shader/vertex.glsl')
@@ -51,11 +56,12 @@ class Game():
             print(glGetShaderInfoLog(self.f_shader))
 
         self.location = {}
-        self.location['a_position'] = glGetAttribLocation(self.program, 'a_position')
-        self.location['a_texcoord'] = glGetAttribLocation(self.program, 'a_texcoord')
         self.location['u_mode_v'] = glGetUniformLocation(self.program, 'u_mode_v')
         self.location['u_mode_f'] = glGetUniformLocation(self.program, 'u_mode_f')
         self.location['u_color'] = glGetUniformLocation(self.program, 'u_color')
+        self.location['a_position'] = glGetAttribLocation(self.program, 'a_position')
+        self.location['a_position_hud'] = glGetAttribLocation(self.program, 'a_position_hud')
+        self.location['a_texcoord'] = glGetAttribLocation(self.program, 'a_texcoord')
         self.texture = 1
 
         glGenTextures(1, self.texture)
@@ -73,23 +79,43 @@ class Game():
         glBindVertexArray(self.vao)
         glBindBuffer(GL_ARRAY_BUFFER, self.b_hud)
         glBufferData(GL_ARRAY_BUFFER, np.array([
-            -1.0, -1.0, 0.0, 0.0,
-            -1.0, 1.0, 0.0, 1.0,
-            1.0, 1.0, 1.0, 1.0,
-            1.0, -1.0, 1.0, 0.0
+            -1.0, -1.0, 0.0, 1.0,
+            -1.0, 1.0, 0.0, 0.0,
+            1.0, 1.0, 1.0, 0.0,
+            1.0, -1.0, 1.0, 1.0
         ], dtype = np.float32), GL_STATIC_DRAW)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.b_hud_index)
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, np.array([
             1, 2, 0, 0, 2, 3
         ], dtype = np.int16), GL_STATIC_DRAW)
+        glVertexAttribPointer(self.location['a_position_hud'], 2, GL_FLOAT, GL_FALSE, 4 * 4, ctypes.c_void_p(0 * 4))
+        glEnableVertexAttribArray(self.location['a_position_hud'])
+        glVertexAttribPointer(self.location['a_texcoord'], 2, GL_FLOAT, GL_FALSE, 4 * 4, ctypes.c_void_p(2 * 4))
+        glEnableVertexAttribArray(self.location['a_texcoord'])
+        self.width, self.height = glfw.get_window_size(self.window)
+        glViewport(0, 0, self.width, self.height)
 
-        glViewport(0, 0, 1280, 720)
+    def load_font(self):
+        pygame.font.init()
+        Font.neodgm_32 = pygame.font.Font('font/neodgm.ttf', 32)
+        Font.neodgm_16 = pygame.font.Font('font/neodgm.ttf', 16)
 
     def key_callback(self, window, key, scancode, action, mods):
         pass
 
+    def mouse_button_callback(self, window, button, action, mods):
+        scale = glfwGetMonitorContentScale(self.monitor)
+        pos_raw = glfwGetCursorPos(window)
+        pos = [pos_raw[0] / scale[0], pos_raw[1] / scale[1]]
+        
+        if action == GLFW_RELEASE and button == GLFW_MOUSE_BUTTON_LEFT:
+            if self.scene == 'title':
+                scenetitle.mouse_up(self, pos)
+            if self.scene == 'game':
+                scenetitle.mouse_up(self, pos)
+
     def window_close_callback(self, window):
-        glfwSetWindowShouldClose(self.window, GLFW_TRUE)
+        glfwSetWindowShouldClose(window, GLFW_TRUE)
 
     def run(self):
         while not glfwWindowShouldClose(self.window):
@@ -100,6 +126,8 @@ class Game():
     def handle_scene(self):
         if self.scene == 'title':
             scenetitle.loop(self)
+        elif self.scene == 'game':
+            scenegame.loop(self)
 
 if __name__ == '__main__':
     Game().run()
