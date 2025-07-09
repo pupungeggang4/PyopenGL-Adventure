@@ -5,6 +5,15 @@ import script.scenegame as scenegame
 
 class Game():
     def __init__(self):
+        self.key_mapping = {
+            'f': GLFW_KEY_W, 'l': GLFW_KEY_A, 'b': GLFW_KEY_S, 'r': GLFW_KEY_D,
+            'c_u': GLFW_KEY_UP, 'c_l': GLFW_KEY_LEFT, 'c_d': GLFW_KEY_D, 'c_r': GLFW_KEY_R
+        }
+        self.key_pressed = {
+            'f': False, 'l': False, 'b': False, 'r': False,
+            'c_u': False, 'c_l': False, 'c_d': False, 'c_r': False
+        }
+
         self.scene = 'title'
         self.state = ''
         self.menu = False
@@ -61,6 +70,8 @@ class Game():
         self.location['u_color'] = glGetUniformLocation(self.program, 'u_color')
         self.location['u_model_pos'] = glGetUniformLocation(self.program, 'u_model_pos')
         self.location['u_model_scale'] = glGetUniformLocation(self.program, 'u_model_scale')
+        self.location['u_cam_rot'] = glGetUniformLocation(self.program, 'u_cam_rot')
+        self.location['u_cam_pos'] = glGetUniformLocation(self.program, 'u_cam_pos')
         self.location['a_position'] = glGetAttribLocation(self.program, 'a_position')
         self.location['a_position_hud'] = glGetAttribLocation(self.program, 'a_position_hud')
         self.location['a_texcoord'] = glGetAttribLocation(self.program, 'a_texcoord')
@@ -120,7 +131,11 @@ class Game():
         self.width, self.height = glfw.get_window_size(self.window)
         glViewport(0, 0, self.width, self.height)
 
-        self.cuboid = Cuboid3(0.1, 0.9, 0.0, 0.1, 0.1, 0.1)
+        self.cuboid1 = Cuboid3(0.2, 0.2, 1.5, 0.1, 0.1, 0.1)
+        self.cuboid2 = Cuboid3(0.2, -0.2, 1.5, 0.1, 0.1, 0.1)
+        self.cuboid3 = Cuboid3(-0.2, 0.2, 1.5, 0.1, 0.1, 0.1)
+        self.cuboid4 = Cuboid3(-0.2, -0.2, 1.5, 0.1, 0.1, 0.1)
+        self.camera = Camera()
 
     def load_font(self):
         pygame.font.init()
@@ -128,7 +143,14 @@ class Game():
         Font.neodgm_16 = pygame.font.Font('font/neodgm.ttf', 16)
 
     def key_callback(self, window, key, scancode, action, mods):
-        pass
+        if action == GLFW_PRESS:
+            for k in self.key_pressed:
+                if key == self.key_mapping[k]:
+                    self.key_pressed[k] = True
+        if action == GLFW_RELEASE:
+            for k in self.key_pressed:
+                if key == self.key_mapping[k]:
+                    self.key_pressed[k] = False
 
     def mouse_button_callback(self, window, button, action, mods):
         scale = glfwGetMonitorContentScale(self.monitor)

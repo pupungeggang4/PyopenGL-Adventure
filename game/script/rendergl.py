@@ -6,6 +6,8 @@ class RenderGL():
         glUniform3f(game.location['u_color'], color[0], color[1], color[2])
         glUniform3f(game.location['u_model_pos'], cuboid.pos.x, cuboid.pos.y, cuboid.pos.z)
         glUniform3f(game.location['u_model_scale'], cuboid.size.x, cuboid.size.y, cuboid.size.z)
+        glUniform3f(game.location['u_cam_pos'], cam.pos.x, cam.pos.y, cam.pos.z)
+        glUniform3f(game.location['u_cam_rot'], cam.rot.x, cam.rot.y, cam.rot.z)
         glBindBuffer(GL_ARRAY_BUFFER, game.b_cuboid)
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, game.b_cuboid_index)
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, ctypes.c_void_p(0))

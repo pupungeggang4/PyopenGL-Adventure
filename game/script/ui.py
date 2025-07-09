@@ -7,4 +7,4 @@ class UI():
         text_erase = [184, 264]
 
     class HUD():
-        pass
+        rect = [20, 660, 80, 40]
