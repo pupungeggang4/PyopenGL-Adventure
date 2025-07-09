@@ -12,7 +12,7 @@ def render(game):
     pygame.draw.rect(game.surface_hud, Color.black, UI.Title.button_erase, 2)
     surf_texture = pygame.image.tobytes(game.surface_hud, 'RGBA')
 
-    glClearColor(0.0, 1.0, 1.0, 1.0)
+    glClearColor(0.0, 0.0, 0.0, 1.0)
     glClear(GL_COLOR_BUFFER_BIT)
     glUseProgram(game.program)
 

@@ -51,14 +51,16 @@ class Game():
         glLinkProgram(self.program)
 
         if not glGetShaderiv(self.v_shader, GL_COMPILE_STATUS):
-            print(glGetShaderInfoLog(self.v_shader))
+            print('v', glGetShaderInfoLog(self.v_shader))
         if not glGetShaderiv(self.f_shader, GL_COMPILE_STATUS):
-            print(glGetShaderInfoLog(self.f_shader))
+            print('f', glGetShaderInfoLog(self.f_shader))
 
         self.location = {}
         self.location['u_mode_v'] = glGetUniformLocation(self.program, 'u_mode_v')
         self.location['u_mode_f'] = glGetUniformLocation(self.program, 'u_mode_f')
         self.location['u_color'] = glGetUniformLocation(self.program, 'u_color')
+        self.location['u_model_pos'] = glGetUniformLocation(self.program, 'u_model_pos')
+        self.location['u_model_scale'] = glGetUniformLocation(self.program, 'u_model_scale')
         self.location['a_position'] = glGetAttribLocation(self.program, 'a_position')
         self.location['a_position_hud'] = glGetAttribLocation(self.program, 'a_position_hud')
         self.location['a_texcoord'] = glGetAttribLocation(self.program, 'a_texcoord')
@@ -92,8 +94,33 @@ class Game():
         glEnableVertexAttribArray(self.location['a_position_hud'])
         glVertexAttribPointer(self.location['a_texcoord'], 2, GL_FLOAT, GL_FALSE, 4 * 4, ctypes.c_void_p(2 * 4))
         glEnableVertexAttribArray(self.location['a_texcoord'])
+        glBindBuffer(GL_ARRAY_BUFFER, self.b_cuboid)
+        glBufferData(GL_ARRAY_BUFFER, np.array([
+            -0.5, -0.5, -0.5,
+            -0.5, 0.5, -0.5,
+            0.5, 0.5, -0.5,
+            0.5, -0.5, -0.5,
+            -0.5, -0.5, 0.5,
+            -0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5,
+            0.5, -0.5, 0.5
+        ], dtype = np.float32), GL_STATIC_DRAW)
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, self.b_cuboid_index)
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, np.array([
+            0, 1, 4, 4, 1, 5,
+            6, 2, 7, 7, 2, 3,
+            5, 6, 4, 4, 6, 7,
+            3, 2, 0, 0, 2, 1,
+            1, 2, 5, 5, 2, 6,
+            4, 7, 0, 0, 7, 3
+        ], dtype = np.int16), GL_STATIC_DRAW)
+        glVertexAttribPointer(self.location['a_position'], 3, GL_FLOAT, GL_FALSE, 3 * 4, ctypes.c_void_p(0 * 4))
+        glEnableVertexAttribArray(self.location['a_position'])
+
         self.width, self.height = glfw.get_window_size(self.window)
         glViewport(0, 0, self.width, self.height)
+
+        self.cuboid = Cuboid3(0.1, 0.9, 0.0, 0.1, 0.1, 0.1)
 
     def load_font(self):
         pygame.font.init()

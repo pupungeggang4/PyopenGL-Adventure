@@ -5,6 +5,7 @@ from OpenGL.GL import *
 from script.asset import *
 from script.ui import *
 from script.save import *
+from script.primitive import *
 from script.function import *
 from script.renderhud import *
 from script.rendergl import *
