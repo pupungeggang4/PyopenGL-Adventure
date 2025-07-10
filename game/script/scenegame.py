@@ -1,11 +1,13 @@
 from script.module import *
 
 def loop(game):
-    game.camera.move(game)
+    game.world.camera.move(game)
     render(game)
 
 def render(game):
     game.surface_hud.fill(Color.transparent)
+    pygame.draw.rect(game.surface_hud, Color.white, UI.HUD.rect_upper)
+    game.surface_hud.blit(Font.neodgm_32.render(f'{round(game.world.camera.pos.x, 1)}, {round(game.world.camera.pos.y, 1)}, {round(game.world.camera.pos.z, 1)}', False, Color.black), UI.HUD.text_position)
     pygame.draw.rect(game.surface_hud, Color.white, UI.HUD.rect)
     surf_texture = pygame.image.tobytes(game.surface_hud, 'RGBA')
 
@@ -24,10 +26,10 @@ def render(game):
 
     glUniform1i(game.location['u_mode_v'], 1)
     glUniform1i(game.location['u_mode_f'], 1)
-    RenderGL.render_cuboid(game, game.cuboid1, game.camera, [0.0, 1.0, 0.0])
-    RenderGL.render_cuboid(game, game.cuboid2, game.camera, [0.0, 0.0, 1.0])
-    RenderGL.render_cuboid(game, game.cuboid3, game.camera, [1.0, 0.0, 0.0])
-    RenderGL.render_cuboid(game, game.cuboid4, game.camera, [1.0, 0.0, 1.0])
+    RenderGL.render_cuboid(game, game.cuboid1, game.world.camera, [0.0, 1.0, 0.0])
+    RenderGL.render_cuboid(game, game.cuboid2, game.world.camera, [0.0, 0.0, 1.0])
+    RenderGL.render_cuboid(game, game.cuboid3, game.world.camera, [1.0, 0.0, 0.0])
+    RenderGL.render_cuboid(game, game.cuboid4, game.world.camera, [1.0, 0.0, 1.0])
 
     glDisable(GL_DEPTH_TEST)
     glEnableVertexAttribArray(game.location['a_position_hud'])

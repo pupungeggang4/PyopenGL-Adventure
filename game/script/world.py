@@ -1,7 +1,8 @@
 from script.module import *
 
 class World_Player():
-    pass
+    def __init__(self):
+        pass
 
 class Camera():
     def __init__(self):
@@ -19,4 +20,5 @@ class Camera():
             self.pos.z -= 0.5 / 60
 
 class World():
-    pass
+    def __init__(self):
+        self.camera = Camera()

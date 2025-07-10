@@ -7,4 +7,6 @@ class UI():
         text_erase = [184, 264]
 
     class HUD():
+        rect_upper = [20, 20, 320, 80]
+        text_position = [24, 24]
         rect = [20, 660, 80, 40]

@@ -129,7 +129,7 @@ class Game():
         glEnableVertexAttribArray(self.location['a_position'])
 
         self.scale = glfwGetMonitorContentScale(self.monitor)
-        if sys.platform == 'darwin':
+        if sys.platform == 'darwin' or sys.platform == 'linux':
             width = int(1280 * self.scale[0])
             height = int(720 * self.scale[1])
         else:
@@ -140,8 +140,8 @@ class Game():
         self.cuboid2 = Cuboid3(0.2, -0.2, 1.5, 0.1, 0.1, 0.1)
         self.cuboid3 = Cuboid3(-0.2, 0.2, 1.5, 0.1, 0.1, 0.1)
         self.cuboid4 = Cuboid3(-0.2, -0.2, 1.5, 0.1, 0.1, 0.1)
-        self.camera = Camera()
-
+        self.world = World()
+        
     def load_font(self):
         pygame.font.init()
         Font.neodgm_32 = pygame.font.Font('font/neodgm.ttf', 32)
@@ -178,7 +178,6 @@ class Game():
     def run(self):
         while not glfwWindowShouldClose(self.window):
             self.clock.tick(self.fps)
-            print(self.clock.get_fps())
             self.handle_scene()
             glfw.poll_events()
 
