@@ -128,8 +128,13 @@ class Game():
         glVertexAttribPointer(self.location['a_position'], 3, GL_FLOAT, GL_FALSE, 3 * 4, ctypes.c_void_p(0 * 4))
         glEnableVertexAttribArray(self.location['a_position'])
 
-        self.width, self.height = glfw.get_window_size(self.window)
-        glViewport(0, 0, self.width, self.height)
+        self.scale = glfwGetMonitorContentScale(self.monitor)
+        if sys.platform == 'darwin':
+            width = int(1280 * self.scale[0])
+            height = int(720 * self.scale[1])
+        else:
+            width, height = 1280, 720
+        glViewport(0, 0, width, height)
 
         self.cuboid1 = Cuboid3(0.2, 0.2, 1.5, 0.1, 0.1, 0.1)
         self.cuboid2 = Cuboid3(0.2, -0.2, 1.5, 0.1, 0.1, 0.1)
@@ -155,7 +160,11 @@ class Game():
     def mouse_button_callback(self, window, button, action, mods):
         scale = glfwGetMonitorContentScale(self.monitor)
         pos_raw = glfwGetCursorPos(window)
-        pos = [pos_raw[0] / scale[0], pos_raw[1] / scale[1]]
+
+        if sys.platform == 'darwin':
+            pos = [pos_raw[0], pos_raw[1]]
+        else:
+            pos = [pos_raw[0] / scale[0], pos_raw[1] / scale[1]]
         
         if action == GLFW_RELEASE and button == GLFW_MOUSE_BUTTON_LEFT:
             if self.scene == 'title':
@@ -169,6 +178,7 @@ class Game():
     def run(self):
         while not glfwWindowShouldClose(self.window):
             self.clock.tick(self.fps)
+            print(self.clock.get_fps())
             self.handle_scene()
             glfw.poll_events()
 
